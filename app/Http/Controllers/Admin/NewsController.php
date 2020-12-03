@@ -72,11 +72,8 @@ class NewsController extends Controller
 
     public function update(Request $request)
     {
-        // Validationをかける
         $this->validate($request, News::$rules);
-        // News Modelからデータを取得する
-        $news = News::find($request->id);
-        // 送信されてきたフォームデータを格納する
+        $news = News::find($request->input('id'));
         $news_form = $request->all();
         if ($request->input('remove')) {
             $news_form['image_path'] = null;
@@ -90,15 +87,15 @@ class NewsController extends Controller
         unset($news_form['_token']);
         unset($news_form['image']);
         unset($news_form['remove']);
-        // 該当するデータを上書きして保存する
         $news->fill($news_form)->save();
 
+        // 以下を追記
         $history = new History;
         $history->news_id = $news->id;
         $history->edited_at = Carbon::now();
         $history->save();
 
-        return redirect('admin/news');
+        return redirect('admin/news/');
     }
 
     public function delete(Request $request)
